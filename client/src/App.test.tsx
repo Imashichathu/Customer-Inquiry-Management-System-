@@ -38,8 +38,12 @@ describe("sign-in flow", () => {
     const user = userEvent.setup();
     render(<App />);
 
+    expect(screen.queryByText("ID")).toBeNull();
     await user.type(await screen.findByLabelText("Work email"), "staff@example.com");
     await user.type(screen.getByLabelText("Password"), "local-demo-password");
+    await user.click(screen.getByRole("button", { name: "Show password" }));
+    expect(screen.getByLabelText("Password").getAttribute("type")).toBe("text");
+    await user.click(screen.getByRole("button", { name: "Hide password" }));
     await user.click(screen.getByRole("button", { name: "Sign in" }));
 
     expect(await screen.findByRole("heading", { name: /Every request/ })).toBeTruthy();
