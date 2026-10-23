@@ -57,6 +57,7 @@ function App() {
   const [user, setUser] = useState<User | null>(null);
   const [signInError, setSignInError] = useState("");
   const [signingIn, setSigningIn] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [listState, setListState] = useState<"loading" | "ready" | "error">("loading");
   const [listError, setListError] = useState("");
@@ -290,27 +291,54 @@ function App() {
 
   if (authState === "signed_out") {
     return (
-      <main className="screen-message">
-        <section className="login-card" aria-labelledby="login-title">
-          <div className="brand-mark" aria-hidden="true">ID</div>
-          <p className="eyebrow">CUSTOMER SUPPORT WORKSPACE</p>
-          <h1 id="login-title">Welcome back</h1>
-          <p className="muted-copy">Sign in with your staff account to manage customer inquiries.</p>
-          <form className="stack-form" onSubmit={handleSignIn}>
-            <label>
-              Work email
-              <input type="email" name="email" autoComplete="username" required maxLength={254} />
-            </label>
-            <label>
-              Password
-              <input type="password" name="password" autoComplete="current-password" required maxLength={200} />
-            </label>
-            {signInError && <p className="form-error" role="alert">{signInError}</p>}
-            <button className="button button--primary button--full" type="submit" disabled={signingIn}>
-              {signingIn ? "Signing in…" : "Sign in"}
-            </button>
-          </form>
-        </section>
+      <main className="login-screen">
+        <div className="login-layout">
+          <section className="login-card" aria-labelledby="login-title">
+            <span className="login-card-accent" aria-hidden="true" />
+            <h1 id="login-title">Welcome back</h1>
+            <p className="muted-copy">Sign in to your customer inquiry management system account.</p>
+            <form className="stack-form" onSubmit={handleSignIn}>
+              <label>
+                Work email
+                <span className="login-input-wrap">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="3.5" y="5.5" width="17" height="13" rx="2" />
+                    <path d="m5 7 7 5.5L19 7" />
+                  </svg>
+                  <input type="email" name="email" autoComplete="username" placeholder="Enter your work email" required maxLength={254} />
+                </span>
+              </label>
+              <label>
+                Password
+                <span className="login-input-wrap">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="5.5" y="10" width="13" height="10" rx="2" />
+                    <path d="M8.5 10V7a3.5 3.5 0 0 1 7 0v3m-3.5 4v2" />
+                  </svg>
+                  <input type={showPassword ? "text" : "password"} name="password" autoComplete="current-password" aria-label="Password" placeholder="Enter your password" required maxLength={200} />
+                  <button
+                    className="password-visibility"
+                    type="button"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    aria-pressed={showPassword}
+                    onClick={() => setShowPassword((visible) => !visible)}
+                  >
+                    {showPassword ? (
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18M10.6 10.7a2 2 0 0 0 2.7 2.7M9.9 5.3A10.8 10.8 0 0 1 12 5c5 0 8.5 4.7 9.5 7-.4.9-1.2 2.1-2.4 3.2M6.2 6.2C3.9 7.7 2.8 9.8 2.5 12c.6 1.3 2 3.3 4.5 4.7A10 10 0 0 0 12 18" /></svg>
+                    ) : (
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5 12 5s9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z" /><circle cx="12" cy="12" r="3" /></svg>
+                    )}
+                  </button>
+                </span>
+              </label>
+              {signInError && <p className="form-error" role="alert">{signInError}</p>}
+              <button className="button button--primary button--full" type="submit" disabled={signingIn}>
+                <span>{signingIn ? "Signing in…" : "Sign in"}</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" /></svg>
+              </button>
+            </form>
+          </section>
+        </div>
       </main>
     );
   }
@@ -385,9 +413,14 @@ function App() {
                 <p className="muted-copy">A shared view of customer conversations, from first hello to resolution.</p>
               </div>
               <div className="heading-actions">
-                <span className="heading-date">{new Intl.DateTimeFormat(undefined, { weekday: "long", month: "long", day: "numeric" }).format(new Date())}</span>
+                <span className="heading-date">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5.5" width="16" height="15" rx="2" /><path d="M8 3.5v4m8-4v4M4 10h16" /></svg>
+                  {new Intl.DateTimeFormat(undefined, { weekday: "long", month: "long", day: "numeric" }).format(new Date())}
+                </span>
                 <button className="button button--primary" onClick={() => { setCreateError(""); setShowCreateForm(true); }}>
-                  <span className="button-plus" aria-hidden="true">+</span> New inquiry
+                  <span className="button-plus" aria-hidden="true">+</span>
+                  New inquiry
+                  <svg className="button-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" /></svg>
                 </button>
               </div>
             </section>
@@ -403,7 +436,7 @@ function App() {
               <div className="filters">
                 <label className="search-field">
                   <span className="visually-hidden">Search inquiries</span>
-                  <span className="search-icon" aria-hidden="true">⌕</span>
+                  <svg className="search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8" /><path d="m16 16 4.5 4.5" /></svg>
                   <input
                     type="search"
                     placeholder="Search customers, subjects…"
@@ -435,12 +468,16 @@ function App() {
                     <span className="empty-orbit empty-orbit--one" />
                     <span className="empty-orbit empty-orbit--two" />
                     <span className="empty-spark">✳</span>
-                    <span className="empty-core">✓</span>
+                    <span className="empty-core">
+                      <svg viewBox="0 0 24 24"><path d="M3 6.5h18v12H3z" /><path d="m3.5 7 8.5 7 8.5-7" /></svg>
+                    </span>
                   </div>
                   <h2>{search || statusFilter !== "all" ? "No matching inquiries" : "Your inbox is clear"}</h2>
                   <p>{search || statusFilter !== "all" ? "Try a different search or status filter." : "Capture the first customer request to get started."}</p>
                   {!search && statusFilter === "all" && (
-                    <button className="button button--secondary" onClick={() => setShowCreateForm(true)}>Create an inquiry</button>
+                    <button className="button button--primary empty-action" onClick={() => { setCreateError(""); setShowCreateForm(true); }}>
+                      <span aria-hidden="true">↻</span> Create new inquiry
+                    </button>
                   )}
                 </div>
               )}
