@@ -15,13 +15,15 @@ A small customer-support workspace built with React, Express, and PostgreSQL. Si
 3. Install dependencies: `npm install`.
 4. Start PostgreSQL: `docker compose up -d database`.
 5. Apply schema migrations: `npm run db:migrate --workspace server`.
-6. Create/update the local staff account: `npm run db:seed --workspace server`.
+6. Create/update the local staff account and insert sample inquiries: `npm run db:seed --workspace server`.
 7. Start the API and frontend: `npm run dev`.
 8. Open <http://localhost:5173> and sign in with `SEED_STAFF_EMAIL` and `SEED_STAFF_PASSWORD` from `.env`.
 
 The API runs on port 4000 and PostgreSQL on port 5432. Set `VITE_API_URL` in a local `.env` if the API is hosted at a different URL. The health endpoint is `/api/health`.
 
 The default local demo account is `staff@example.com` with password `local-demo-password-change-me`; both values come from `.env.example` and can be changed before running the seed command. The values in `.env.example` are for local development only. Do not use its sample password or JWT secret in a deployed environment. The seed command hashes the configured password and does not store the plaintext password.
+
+The seed command also adds five clearly labeled sample inquiries in a mix of statuses. It skips sample subjects that already exist for the seeded staff account, so rerunning the command does not duplicate them.
 
 ## Database and API
 
