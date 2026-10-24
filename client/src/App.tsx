@@ -344,27 +344,37 @@ function App() {
   }
 
   return (
-    <main className="app-shell">
-      <header className="topbar">
-        <a className="wordmark" href="/" aria-label="Inquiry Desk home" onClick={(event) => { event.preventDefault(); closeInquiry(); }}>
-          <span className="brand-mark" aria-hidden="true">ID</span>
-          <span>Inquiry Desk</span>
-        </a>
-        <div className="account">
-          {accountError && <span className="account-error" role="alert">{accountError}</span>}
-          <span className="workspace-presence"><span aria-hidden="true" />Team workspace</span>
-          <span className="account-avatar" aria-hidden="true">
-            {user?.fullName.trim().charAt(0).toUpperCase()}
-          </span>
-          <span className="account-name">{user?.fullName}</span>
-          <button className="button button--quiet" onClick={handleSignOut}>Sign out</button>
-        </div>
-      </header>
+    <main className={`app-shell${selectedId !== null ? " app-shell--detail" : ""}`}>
+      {selectedId === null && (
+        <header className="topbar">
+          <a className="wordmark" href="/" aria-label="Inquiry Desk home" onClick={(event) => { event.preventDefault(); closeInquiry(); }}>
+            <span className="brand-mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M5 5.5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-6l-4 3v-3H5a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2Z" /><path d="M8 10h8m-8 3h5" /></svg>
+            </span>
+            <span>Inquiry Desk</span>
+          </a>
+          <div className="account">
+            {accountError && <span className="account-error" role="alert">{accountError}</span>}
+            <span className="workspace-presence"><span aria-hidden="true" />Team workspace</span>
+            <span className="account-avatar" aria-hidden="true">
+              {user?.fullName.trim().charAt(0).toUpperCase()}
+            </span>
+            <span className="account-name">{user?.fullName}</span>
+            <button className="button button--quiet" onClick={handleSignOut}>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 5H5.5A1.5 1.5 0 0 0 4 6.5v11A1.5 1.5 0 0 0 5.5 19H10m4-3 4-4-4-4m4 4H9" /></svg>
+              Sign out
+            </button>
+          </div>
+        </header>
+      )}
 
-      <div className="page-content">
+      <div className={`page-content${selectedId !== null ? " page-content--detail" : ""}`}>
         {selectedId !== null ? (
           <section className="detail-view" aria-labelledby="detail-title">
-            <button className="back-link" onClick={closeInquiry}>← All inquiries</button>
+            <button className="back-link" onClick={closeInquiry}>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m7 7-7-7 7-7" /></svg>
+              All inquiries
+            </button>
             {detailState === "loading" && <p className="loading-state" role="status">Loading inquiry…</p>}
             {detailState === "error" && (
               <div className="empty-state" role="alert">
@@ -377,29 +387,44 @@ function App() {
               <article className="detail-card">
                 <div className="detail-heading">
                   <div>
-                    <p className="eyebrow">INQUIRY #{selected.id}</p>
+                    <p className="detail-id">INQUIRY #{selected.id}</p>
                     <h1 id="detail-title">{selected.subject}</h1>
-                    <p className="muted-copy">Submitted by {selected.createdByName} · {formatDate(selected.createdAt)}</p>
+                    <p className="detail-submitted">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5.5" width="16" height="15" rx="2" /><path d="M8 3.5v4m8-4v4M4 10h16" /></svg>
+                      Submitted by {selected.createdByName} <span aria-hidden="true">·</span> {formatDate(selected.createdAt)}
+                    </p>
                   </div>
-                  <label className="status-field">
+                  <label className={`status-field status-field--${selected.status}`}>
                     Status
-                    <select
-                      aria-label="Inquiry status"
-                      value={selected.status}
-                      disabled={statusSaving}
-                      onChange={(event) => handleStatusChange(event.target.value as InquiryStatus)}
-                    >
-                      {Object.entries(statusLabels).map(([value, label]) => (
-                        <option value={value} key={value}>{label}</option>
-                      ))}
-                    </select>
+                    <span className="status-control">
+                      <span className="status-indicator" aria-hidden="true" />
+                      <select
+                        aria-label="Inquiry status"
+                        value={selected.status}
+                        disabled={statusSaving}
+                        onChange={(event) => handleStatusChange(event.target.value as InquiryStatus)}
+                      >
+                        {Object.entries(statusLabels).map(([value, label]) => (
+                          <option value={value} key={value}>{label}</option>
+                        ))}
+                      </select>
+                    </span>
                   </label>
                 </div>
                 {statusNotice && <p className="notice" role="status">{statusNotice}</p>}
                 <dl className="detail-fields">
-                  <div><dt>Customer</dt><dd>{selected.customerName}</dd></div>
-                  <div><dt>Contact</dt><dd>{selected.contactMethod}</dd></div>
-                  <div className="detail-description"><dt>Description</dt><dd>{selected.description}</dd></div>
+                  <div className="detail-field">
+                    <span className="detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5" /><path d="M5 20c.5-3.5 3-5.5 7-5.5s6.5 2 7 5.5" /></svg></span>
+                    <div><dt>Customer</dt><dd>{selected.customerName}</dd></div>
+                  </div>
+                  <div className="detail-field">
+                    <span className="detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="1.5" /><path d="m4.5 7 7.5 6 7.5-6" /></svg></span>
+                    <div><dt>Contact</dt><dd>{selected.contactMethod}</dd></div>
+                  </div>
+                  <div className="detail-field detail-description">
+                    <span className="detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 4.5h12a1.5 1.5 0 0 1 1.5 1.5v12a1.5 1.5 0 0 1-1.5 1.5H6A1.5 1.5 0 0 1 4.5 18V6A1.5 1.5 0 0 1 6 4.5Z" /><path d="M8 9h8m-8 3h8m-8 3h5" /></svg></span>
+                    <div><dt>Description</dt><dd>{selected.description}</dd></div>
+                  </div>
                 </dl>
               </article>
             )}
@@ -415,10 +440,10 @@ function App() {
               <div className="heading-actions">
                 <span className="heading-date">
                   <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5.5" width="16" height="15" rx="2" /><path d="M8 3.5v4m8-4v4M4 10h16" /></svg>
-                  {new Intl.DateTimeFormat(undefined, { weekday: "long", month: "long", day: "numeric" }).format(new Date())}
+                  Today, {new Intl.DateTimeFormat(undefined, { month: "long", day: "numeric" }).format(new Date())}
                 </span>
                 <button className="button button--primary" onClick={() => { setCreateError(""); setShowCreateForm(true); }}>
-                  <span className="button-plus" aria-hidden="true">+</span>
+                  <svg className="button-support-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 13v-1a7.5 7.5 0 0 1 15 0v1M4.5 13h2a1.5 1.5 0 0 1 1.5 1.5v2A1.5 1.5 0 0 1 6.5 18h-1A1.5 1.5 0 0 1 4 16.5v-2A1.5 1.5 0 0 1 5.5 13Zm15 0h-2a1.5 1.5 0 0 0-1.5 1.5v2a1.5 1.5 0 0 0 1.5 1.5h1a1.5 1.5 0 0 0 1.5-1.5v-2a1.5 1.5 0 0 0-1.5-1.5ZM17 18a4 4 0 0 1-4 2h-1" /></svg>
                   New inquiry
                   <svg className="button-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" /></svg>
                 </button>
@@ -429,9 +454,19 @@ function App() {
               <div className="panel-heading">
                 <div>
                   <h2>Your inbox</h2>
-                  <p>{listState === "ready" ? `${inquiries.length} ${inquiries.length === 1 ? "conversation" : "conversations"} in this view` : "Your shared team workspace"}</p>
+                  <p>View and respond to customer inquiries.</p>
                 </div>
-                <span className="shared-label"><span aria-hidden="true">✳</span> SHARED INBOX</span>
+                <label className="filter-sort-field">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16l-6.5 7.5V19l-3 1v-7.5L4 5Z" /></svg>
+                  <span className="visually-hidden">Filter and sort inquiries</span>
+                  <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
+                    <option value="all">Filter &amp; Sort</option>
+                    <option value="new">New inquiries</option>
+                    <option value="in_progress">In progress</option>
+                    <option value="resolved">Resolved</option>
+                  </select>
+                  <svg className="filter-sort-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5" /></svg>
+                </label>
               </div>
               <div className="filters">
                 <label className="search-field">
@@ -444,15 +479,10 @@ function App() {
                     onChange={(event) => setSearch(event.target.value)}
                   />
                 </label>
-                <label className="filter-field">
-                  <span className="visually-hidden">Filter by status</span>
-                  <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
-                    <option value="all">All statuses</option>
-                    <option value="new">New</option>
-                    <option value="in_progress">In Progress</option>
-                    <option value="resolved">Resolved</option>
-                  </select>
-                </label>
+                <div className="inbox-scope">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2" /><path d="M4 12h4l1.5 2h5L16 12h4" /></svg>
+                  Shared inbox
+                </div>
               </div>
               {listState === "loading" && <p className="loading-state" role="status">Loading inquiries…</p>}
               {listState === "error" && (
@@ -473,10 +503,11 @@ function App() {
                     </span>
                   </div>
                   <h2>{search || statusFilter !== "all" ? "No matching inquiries" : "Your inbox is clear"}</h2>
-                  <p>{search || statusFilter !== "all" ? "Try a different search or status filter." : "Capture the first customer request to get started."}</p>
+                  <p>{search || statusFilter !== "all" ? "Try a different search or status filter." : "Capture the latest customer requests, get started."}</p>
                   {!search && statusFilter === "all" && (
                     <button className="button button--primary empty-action" onClick={() => { setCreateError(""); setShowCreateForm(true); }}>
-                      <span aria-hidden="true">↻</span> Create new inquiry
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5" /><path d="M5.6 9A7 7 0 0 1 18 6l2 2M4 16l2 2a7 7 0 0 0 12.4-3" /></svg>
+                      Create new inquiry
                     </button>
                   )}
                 </div>
@@ -488,8 +519,8 @@ function App() {
                       <span className="inquiry-main">
                         <span className="inquiry-subject">{inquiry.subject}</span>
                         <span className="inquiry-meta">{inquiry.customerName} <span aria-hidden="true">·</span> {inquiry.contactMethod}</span>
+                        <span className={`status-badge status-badge--${inquiry.status}`}>{statusLabels[inquiry.status]}</span>
                       </span>
-                      <span className={`status-badge status-badge--${inquiry.status}`}>{statusLabels[inquiry.status]}</span>
                       <span className="inquiry-date">{formatDate(inquiry.updatedAt)}</span>
                       <span className="row-chevron" aria-hidden="true">›</span>
                     </button>
